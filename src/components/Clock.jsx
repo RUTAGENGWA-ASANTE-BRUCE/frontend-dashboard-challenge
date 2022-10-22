@@ -1,4 +1,4 @@
-// import AnalogClock from "analog-clock-react";
+import AnalogClock from "analog-clock-react";
 import React, { useState } from "react";
 function Clock() {
   const [options, setOptions] = useState({
@@ -33,8 +33,7 @@ function Clock() {
   };
 
   setInterval(updateClock, 1000);
-  // return <AnalogClock {...options} />;
-  <div />
+  return <AnalogClock {...options} />;
 }
 
 export default Clock;
