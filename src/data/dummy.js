@@ -152,11 +152,14 @@ export const themeColors = [
 
 
 export const pieChartData = [
-  { x: 'Labour', y: 18, text: '18%' },
+  { x: 'Labour', y: 4, text: '4%' },
   { x: 'Legal', y: 8, text: '8%' },
-  { x: 'Production', y: 15, text: '15%' },
+  { x: 'Production', y: 12, text: '12%' },
   { x: 'License', y: 11, text: '11%' },
-  { x: 'Facilities', y: 18, text: '18%' },
-  { x: 'Taxes', y: 14, text: '14%' },
-  { x: 'Insurance', y: 16, text: '16%' },
+  { x: 'Facilities', y: 15, text: '15%' },
+  { x: 'Taxes', y: 5, text: '5%' },
+  { x: 'Land', y: 7, text: '7%' },
+  { x: 'Education', y: 10, text: '10%' },
+  { x: 'Entertainment', y: 16, text: '16%' },
+  { x: 'Insurance', y: 12, text: '12%' },
 ];
