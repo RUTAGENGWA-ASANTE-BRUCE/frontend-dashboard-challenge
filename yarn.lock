@@ -9326,6 +9326,16 @@ three-mesh-bvh@^0.5.15:
   resolved "https://registry.yarnpkg.com/three-mesh-bvh/-/three-mesh-bvh-0.5.17.tgz#1f9bdcd7992e86dc3665664c1fe5cedd7be4bd9f"
   integrity sha512-0iyqZe0Op6tH7nqVI4L2Ae1tACiYliJvx0cFvehrVzzfZRW8p4c9GYnqGPPN5+x7Q8L5WjJC8kgoA8Z+/+1oAQ==
 
+three-obj-mtl-loader@^1.0.3:
+  version "1.0.3"
+  resolved "https://registry.yarnpkg.com/three-obj-mtl-loader/-/three-obj-mtl-loader-1.0.3.tgz#2901efd5b77cce29b61733c63f196432ee653667"
+  integrity sha512-0z7BfyG6vYPY9RvxJvL4rq8PbNrF42Kn4zxeqTfeDzJN++2oKbtCQhxHs5vLULnDuCRTEyDFf5TYvO+1vnJ7KQ==
+
+three-orbitcontrols@^2.110.3:
+  version "2.110.3"
+  resolved "https://registry.yarnpkg.com/three-orbitcontrols/-/three-orbitcontrols-2.110.3.tgz#ca9c91d5ec2f4731a1140acf2ff0281e15988edf"
+  integrity sha512-BNNbksJwbN3/MmT0X/gjz5ZCchm7bjk26SUdtJYRxfEYjDfkb/0PeUTHE/KuyJ5vb/owK3mojyy3vcqDx99sRA==
+
 three-stdlib@^2.17.3:
   version "2.17.3"
   resolved "https://registry.yarnpkg.com/three-stdlib/-/three-stdlib-2.17.3.tgz#f92d322810d81379a51344b21e0a2e941b84cb8f"

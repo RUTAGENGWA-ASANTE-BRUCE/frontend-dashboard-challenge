@@ -1,123 +1,134 @@
-import React, { useRef, useState,Suspense } from 'react'
-import ReactDOM from 'react-dom'
-import Grid from "./Grid";
-import {OrbitControls, useTexture, Text,Box } from "@react-three/drei";
-import { Canvas, useFrame } from '@react-three/fiber'
-const Cube = ({ position, rotation, scale = [1, 1, 1], handleClick }) => (
-  <group position={position} rotation={rotation} scale={scale}>
-    <Box args={[1, 1, 1]} onClick={handleClick}>
-      <meshStandardMaterial attach="material" color="white" />
-    </Box>
-  </group>
-);
-// function Box(props) {
-//     // This reference will give us direct access to the mesh
-//     const mesh = useRef()
-//     // Set up state for the hovered and active state
-//     const [hovered, setHover] = useState(false)
-//     const [active, setActive] = useState(false)
-//     // Rotate mesh every frame, this is outside of React without overhead
-//     useFrame(() => (mesh.current.rotation.x += 0.01))
-  
-//     return (
-//       <mesh
-//         {...props}
-//         ref={mesh}
-//         scale={active ? 1.5 : 1}
-//         onClick={(event) => setActive(!active)}
-//         onPointerOver={(event) => setHover(true)}
-//         onPointerOut={(event) => setHover(false)}>
-//         <boxGeometry args={[1, 2, 3]} />
-//         <meshStandardMaterial color={hovered ? 'hotpink' : 'orange'} />
-//       </mesh>
-//     )
-//   }
-  const Light = ({
-    position,
-    color,
-    intensity,
-    orbitalOffset = 0,
-    orbitalSpeed = 1
-  }) => {
-    const ref = useRef();
-    useFrame(() => {
-      let date = Date.now() * orbitalSpeed * 0.001 + orbitalOffset;
-      ref.current.position.set(
-        Math.cos(date) * 2 + position[0],
-        Math.sin(date) * 2 + position[1],
-        Math.sin(date) * 2 + position[2]
-      );
-    });
-    const texture = useTexture("lightbulb.png");
-    return (
-      <group position={position} ref={ref}>
-        <sprite>
-          <spriteMaterial
-            attach="material"
-            map={texture}
-            transparent
-            opacity={0.7}
-            color={color}
-          />
-        </sprite>
-        <pointLight color={color} intensity={intensity} decay={2} distance={20} />
-      </group>
+import React, { Component } from "react";
+import * as THREE from "three";
+
+class Scene extends Component {
+  constructor(props) {
+    super(props);
+
+    this.start = this.start.bind(this);
+    this.stop = this.stop.bind(this);
+    this.animate = this.animate.bind(this);
+  }
+
+  componentDidMount() {
+    let scene = new THREE.Scene();
+    let camera = new THREE.PerspectiveCamera(
+      60,
+      this.mount.clientWidth / this.mount.clientHeight,
+      0.1,
+      10
     );
-  };
+    camera.position.set(1, 1.5, 1).setLength(2.5);
+    camera.lookAt(scene.position);
+    let renderer = new THREE.WebGLRenderer({
+      antialias: true,
+    });
+    renderer.setSize(this.mount.clientWidth, this.mount.clientHeight);
+    renderer.setClearColor(0x161616);
+    // document.body.appendChild(renderer.domElement);
+    // let controls = new OrbitControls(camera, renderer.domElement);
 
-export default function Graph3D(){
-    const [xPosition, setXPosition] = useState(0);
-    const [yPosition, setYPosition] = useState(0);
-    const [zPosition, setZPosition] = useState(0);
-  
-    const [xRotation, setXRotation] = useState(0);
-    const [yRotation, setYRotation] = useState(0);
-    const [zRotation, setZRotation] = useState(0);
-  
-    const [xScale, setXScale] = useState(1);
-    const [yScale, setYScale] = useState(1);
-    const [zScale, setZScale] = useState(1);
-  
+    let light = new THREE.DirectionalLight(0xffffff, 1);
+    light.position.setScalar(1);
+    scene.add(light, new THREE.AmbientLight(0xffffff, 0.5));
+
+    let grid = new THREE.GridHelper(2, 20, 0xffff00, 0xffff00);
+    grid.position.y = -0.001;
+    scene.add(grid, new THREE.AxesHelper(1));
+
+    let graphGeom = new THREE.PlaneGeometry(2, 2, 20, 20);
+    graphGeom.rotateX(Math.PI * -0.5);
+    let graphMat = new THREE.MeshNormalMaterial({
+      side: THREE.DoubleSide,
+      wireframe: false,
+    });
+    let graph = new THREE.Mesh(graphGeom, graphMat);
+
+    // f(x,z)
+    let pos = graphGeom.attributes.position;
+    for (let i = 0; i < pos.count; i++) {
+      let x = pos.getX(i);
+      let z = pos.getZ(i);
+      pos.setY(
+        i,
+        Math.sin(x * z * Math.PI) * Math.cos(z * z * Math.PI * 0.5) * 0.75
+      );
+    }
+    graphGeom.computeVertexNormals();
+
+    scene.add(graph);
+
+    // const width = this.mount.clientWidth;
+    // const height = this.mount.clientHeight;
+
+    // const scene = new THREE.Scene();
+    // const camera = new THREE.PerspectiveCamera(75, width / height, 0.1, 1000);
+    // const renderer = new THREE.WebGLRenderer({ antialias: true });
+    // const geometry = new THREE.BoxGeometry(1, 1, 1);
+    // const material = new THREE.MeshBasicMaterial({ color: "#433F81" });
+    // const cube = new THREE.Mesh(geometry, material);
+
+    // camera.position.z = 4;
+    // scene.add(cube);
+    // renderer.setClearColor("#000000");
+    // renderer.setSize(width, height);
+
+    // window.addEventListener("resize", onResize);
+
+    renderer.setAnimationLoop((_) => {
+      renderer.render(scene, camera);
+    });
+
+    function onResize(event) {
+      camera.aspect = this.mount.clientWidth /this.mount.clientHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(this.mount.clientWidth, this.mount.clientHeight);
+    }
+
+    this.scene = scene;
+    this.camera = camera;
+    this.renderer = renderer;
+    this.mount.appendChild(this.renderer.domElement);
+    this.start();
+  }
+
+  componentWillUnmount() {
+    this.stop();
+    this.mount.removeChild(this.renderer.domElement);
+  }
+
+  start() {
+    if (!this.frameId) {
+      this.frameId = requestAnimationFrame(this.animate);
+    }
+  }
+
+  stop() {
+    cancelAnimationFrame(this.frameId);
+  }
+
+  animate() {
+    this.cube.rotation.x += 0.01;
+    this.cube.rotation.y += 0.01;
+
+    this.renderScene();
+    this.frameId = window.requestAnimationFrame(this.animate);
+  }
+
+  renderScene() {
+    this.renderer.render(this.scene, this.camera);
+  }
+
+  render() {
     return (
-        <Suspense>
-
-        <Canvas  camera={{ position: [0, 2, 10] }}>
-        
-          <OrbitControls />
-          <directionalLight intensity={0.5} position={[6, 2, 1]} />
-          <ambientLight intensity={0.1} />
-          <Grid size={10} />
-          {/* <Light position={[3, 0, 2]} color="red" intensity={2} offset={200} /> */}
-          {/* <Light
-            position={[2, 2, -2]}
-            color="blue"
-            intensity={2}
-            distance={10}
-            orbitalSpeed={2}
-          /> */}
-          {/* <Light
-            position={[-3, 0, 2]}
-            color="green"
-            intensity={2}
-            orbitalSpeed={3}
-          /> */}
-          
-          <Cube
-            handleClick={() => console.log("clicked on the cube")}
-            rotation={[
-              xRotation * Math.PI,
-              yRotation * Math.PI,
-              zRotation * Math.PI
-            ]}
-            position={[xPosition, yPosition, zPosition]}
-            scale={[xScale, yScale, zScale]}
-          />
-         
-        <ambientLight />
-        <pointLight position={[10, 10, 10]}  />
-    {/* <Box position={[-1.2, 0, 0/]} /> */}
-    {/* <Box position={[1.2, 0, 0]} /> */}
-  </Canvas>
-        </Suspense>
-    )
+      <div
+        style={{ width: "400px", height: "400px" }}
+        ref={(mount) => {
+          this.mount = mount;
+        }}
+      ></div>
+    );
+  }
 }
+
+export default Scene;
