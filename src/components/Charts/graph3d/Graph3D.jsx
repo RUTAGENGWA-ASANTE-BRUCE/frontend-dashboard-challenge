@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import * as THREE from "three";
+import {OrbitControls} from './Controls'
 
 class Scene extends Component {
   constructor(props) {
@@ -22,11 +23,12 @@ class Scene extends Component {
     camera.lookAt(scene.position);
     let renderer = new THREE.WebGLRenderer({
       antialias: true,
+      alpha:true
     });
     renderer.setSize(this.mount.clientWidth, this.mount.clientHeight);
     renderer.setClearColor(0x161616);
     // document.body.appendChild(renderer.domElement);
-    // let controls = new OrbitControls(camera, renderer.domElement);
+    let controls = new OrbitControls(camera, renderer.domElement);
 
     let light = new THREE.DirectionalLight(0xffffff, 1);
     light.position.setScalar(1);
@@ -41,7 +43,7 @@ class Scene extends Component {
     let graphMat = new THREE.MeshNormalMaterial({
       side: THREE.DoubleSide,
       wireframe: false,
-    });
+    }); 
     let graph = new THREE.Mesh(graphGeom, graphMat);
 
     // f(x,z)
@@ -49,13 +51,15 @@ class Scene extends Component {
     for (let i = 0; i < pos.count; i++) {
       let x = pos.getX(i);
       let z = pos.getZ(i);
+
       pos.setY(
         i,
-        Math.sin(x * z * Math.PI) * Math.cos(z * z * Math.PI * 0.5) * 0.75
+        Math.pow((1-Math.pow(x,2)-Math.pow(z,2)),1/2)
       );
+      
     }
     graphGeom.computeVertexNormals();
-
+    controls.update();
     scene.add(graph);
 
     // const width = this.mount.clientWidth;
